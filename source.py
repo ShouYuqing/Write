@@ -1,12 +1,15 @@
-# copy & paste code from github with commends added
-# 11/20/2019 ys895
+# modified version
+# 11/30/2019 ys895
 import cv2
 import numpy as np
 import pyautogui
 from pynput.mouse import Button, Controller
 import time
+  
+cap = cv2.VideoCapture(1)
+cap.set(3,640) 
+cap.set(4,640)
 
-cap = cv2.VideoCapture(0)
 time.sleep(1.1)
 _,img = cap.read()
 alpha = 2
@@ -15,13 +18,21 @@ gamma = 0.5
 check = False
 pts = [(0,0),(0,0),(0,0),(0,0)]
 pointIndex = 0
-AR = (740,1280)
+# computer screen size
+AR = (740, 1280)
 oppts = np.float32([[0,0],[AR[1],0],[0,AR[0]],[AR[1],AR[0]]])
 a = 0
 b = 0
-lower = (0, 65, 200)
-upper = (90,175,255)
+# set the color upper bound&lower bound
+# blue
+#lower = (110, 50, 250)
+#upper = (130,255,255)
 
+# red
+lower = (160, 100, 200)
+upper = (179, 255, 255)
+
+# gamma transformation
 def adjust_gamma(image, gamma):
 
    invGamma = 1.0 / gamma
@@ -30,45 +41,49 @@ def adjust_gamma(image, gamma):
 
    return cv2.LUT(image, table)
 
-# used to add four points and record the position of the points
+# record the coordinates of the points in the window
 def draw_circle(event,x,y,flags,param):
 	global img
 	global pointIndex
 	global pts
 
 	if event == cv2.EVENT_LBUTTONDOWN:
-                cv2.circle(img,(x,y),5,(0,255,0),-1)
-                pts[pointIndex] = (x,y)
-                #print(pointIndex)
-                pointIndex = pointIndex + 1
-               
+			cv2.circle(img,(x,y),5,(0,255,0),-1)
+			pts[pointIndex] = (x,y)
+			#print(pointIndex)
+			pointIndex = pointIndex + 1
+
 
 # constantly show the image img
-def show_window():                       
-        while True:
-                #print(pts,pointIndex-1)
-                cv2.imshow('img', img)
-                
-                if(pointIndex == 4):
-                        break
-                
-                if (cv2.waitKey(20) & 0xFF == 27) :
-                        break
+def show_window():  
+		global pts                     
+		while True:
+				#print(pts,pointIndex-1)
+				cv2.imshow('img', img)
+					
+				if(pointIndex == 4):
+					print(pts)
+					break
+						
+				if (cv2.waitKey(20) & 0xFF == 27) :
+					break
 
 # perspective transformation
+# same object's position in different coordinates
 def get_persp(image,pts):
-        ippts = np.float32(pts)
-        Map = cv2.getPerspectiveTransform(ippts,oppts)
-        warped = cv2.warpPerspective(image, Map, (AR[1], AR[0]))
-        return warped
+    ippts = np.float32(pts)
+    Map = cv2.getPerspectiveTransform(ippts,oppts)
+    warped = cv2.warpPerspective(image, Map, (AR[1], AR[0]))
+    return warped
 
 cv2.namedWindow('img')
 # mouse callback functions
 cv2.setMouseCallback('img',draw_circle)
 print('Top left, Top right, Bottom Right, Bottom left')
 
-# constantly show the image img
+# constantly show the image img unless there are four points detected
 show_window()
+cv2.destroyAllWindows()
 
 while True:
 	# capture the frame by the camera
@@ -101,6 +116,9 @@ while True:
 		((x, y), radius) = cv2.minEnclosingCircle(c)
 		a = x
 		b = y
+		print(a)
+		print(b)
+		print("a:" + str(b) + ", b:" + str(b))
 		M = cv2.moments(c)
 		if M["m00"] != 0:
 			center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
@@ -115,7 +133,7 @@ while True:
 			# then update the list of tracked points
 			cv2.circle(frame, (int(x), int(y)), int(radius),
 				(0, 255, 255), 2)
-			
+	
 			cv2.circle(frame, center, 5, (0, 0, 255), -1)
 			#pts.appendleft(center)
 
@@ -125,6 +143,7 @@ while True:
 	m = (a/1280)*100
 	n = (b/740)*100 
 
+	# coordinates when press the button
 	k = (width*m)/100
 	c = (height*n)/100
 
@@ -132,23 +151,27 @@ while True:
 	#pyautogui.moveTo(k,c)
 	
 	if check == True :
-		#print('h')
-		#mouse.position = (int(k), int(c))
+		mouse.position = (int(k), int(c))
+		print(int(k),int(c))
 		mouse.press(Button.left)
-		mouse.release(Button.left)
+		#time.sleep(0.2)
+		#mouse.release(Button.left)
         
 	else:
            mouse.release(Button.left)
 
 	check = False   
 
-	cv2.imshow('frame',frame)
-	cv2.imshow('dilate',otsu)
+	#cv2.imshow('mask', mask)
+	#cv2.imshow('warped',warped)
+	#cv2.imshow('blurred', blurred)
+	#cv2.imshow('hsv', hsv)
+	#cv2.imshow('frame',frame)
+	#cv2.imshow('dilate',otsu)
+	
 
 	k=cv2.waitKey(5) & 0xFF
 	if k == 27:
 		break
 
-
-cv2.destroyAllWindows()
 cap.release()
