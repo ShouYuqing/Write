@@ -18,7 +18,7 @@ gamma = 0.5
 check = False
 pts = [(0,0),(0,0),(0,0),(0,0)]
 pointIndex = 0
-# computer screen size
+# image size
 AR = (740, 1280)
 oppts = np.float32([[0,0],[AR[1],0],[0,AR[0]],[AR[1],AR[0]]])
 a = 0
@@ -91,16 +91,14 @@ while True:
 	warped = get_persp(frame, pts)
 
 	blurred = cv2.GaussianBlur(warped, (9, 9), 0)
-	#hsv = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
+	
 	adjusted = adjust_gamma(blurred, gamma)
-   	#cv2.putText(adjusted, "g={}".format(gamma), (10, 30),cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 3)
+   	
 	hsv = cv2.cvtColor(adjusted,cv2.COLOR_BGR2HSV)
 	mask = cv2.inRange(hsv, lower, upper)
 
 	# ret & otsu
 	ret, otsu = cv2.threshold(mask,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-
-	#hsv = cv2.GaussianBlur(hsvv, (5, 5), 0)
 
 	# find contours from the previous image
 	cnts = cv2.findContours(otsu.copy(), cv2.RETR_EXTERNAL,
@@ -143,7 +141,7 @@ while True:
 	m = (a/1280)*100
 	n = (b/740)*100 
 
-	# coordinates when press the button
+	# coordinates in the screen
 	k = (width*m)/100
 	c = (height*n)/100
 
