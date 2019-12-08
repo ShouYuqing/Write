@@ -8,7 +8,19 @@ import time
 
 class Writer:
     def __init__(self, mouse, alpha = 2, gamma = 0.5, points = [(0,0),(0,0),(0,0),(0,0)], flag = False, prc_img_size = (740,1280), lower = (160, 100, 200), upper = (179, 255, 255), points_cnt = 0):
-        self.cap = cv2.VideoCapture(0)
+        '''
+        Writer object
+        :param mouse: mouse object
+        :param alpha: value of alpha
+        :param gamma:  value of gamma
+        :param points: coordinates of the image on the cv windows
+        :param flag: initial flag
+        :param prc_img_size:  process image size
+        :param lower: lower bound of the coloe
+        :param upper: upper bound of the color
+        :param points_cnt: counter of points
+        '''
+        self.cap = cv2.VideoCapture(1)
         self.cap.set(3,640) 
         self.cap.set(4,640)
         _,self.img = self.cap.read()
@@ -25,9 +37,16 @@ class Writer:
 
     # gamma transformation
     def adjust_gamma(self, image, gamma):
+        '''
+        adjust value of gamma
+        :param image:
+        :param gamma:
+        :return:
+        '''
         invGamma = 1.0 / gamma
         table = np.array([((i / 255.0) ** invGamma) * 255
             for i in np.arange(0, 256)]).astype("uint8")
+        # LUT transform
         return cv2.LUT(image, table)
     
     # record the coordinates of the points in the window
@@ -143,7 +162,7 @@ class Writer:
             self.flag = False   
 
             cv2.imshow('mask', mask)
-            #cv2.imshow('warped',warped)
+            cv2.imshow('warped',warped)
             #cv2.imshow('blurred', blurred)
             #cv2.imshow('hsv', hsv)
             #cv2.imshow('frame',frame)
@@ -156,7 +175,8 @@ class Writer:
 
         self.cap.release()
 
-       
+
+# main function
 mouse = Controller()
 writer = Writer(mouse)
 writer.write()
