@@ -7,7 +7,7 @@ from pynput.mouse import Button, Controller
 import time
 
 class Writer:
-    def __init__(self, mouse, alpha = 2, gamma = 0.5, points = [(0,0),(0,0),(0,0),(0,0)], flag = False, prc_img_size = (740,1280), lower = (160, 100, 200), upper = (179, 255, 255), points_cnt = 0):
+    def __init__(self, mouse, alpha = 2, gamma = 0.5, points = [(0,0),(0,0),(0,0),(0,0)], flag = False, prc_img_size = (740/2,1280/2), lower = (160, 100, 200), upper = (179, 255, 255), points_cnt = 0):
         '''
         Writer object
         :param mouse: mouse object
@@ -20,8 +20,8 @@ class Writer:
         :param upper: upper bound of the color
         :param points_cnt: counter of points
         '''
-        self.cap = cv2.VideoCapture(1)
-        self.cap.set(3,640) 
+        self.cap = cv2.VideoCapture(0)
+        self.cap.set(3,640)
         self.cap.set(4,640)
         _,self.img = self.cap.read()
         self.alpha = alpha
