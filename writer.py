@@ -1,5 +1,6 @@
 # 11/30/2019
-
+# ECE5725 Final Project
+# Yuqing Shou(ys895), Jiachao Chen(jc3345)
 import cv2
 import numpy as np
 import pyautogui
@@ -195,6 +196,7 @@ class Writer:
         self.cap.release()
 
 # main function
-mouse = Controller()
-writer = Writer(mouse)
-writer.write()
+if __name__ == "__main__":
+    mouse = Controller()
+    writer = Writer(mouse)
+    writer.write()
